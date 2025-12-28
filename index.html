@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 全局防盗链与 CORS 辅助 -->
+    <meta name="referrer" content="no-referrer">
     <title>Stream - AI 工作台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,21 +21,14 @@
         }
 
         body {
-            background-color: #ffffff;
-            color: #1f2937;
+            background-color: #ffffff; color: #1f2937;
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Noto Sans SC', sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
+            margin: 0; display: flex; height: 100vh; overflow: hidden;
         }
 
         /* 侧边栏及遮罩 */
         #sidebar {
-            width: 280px;
-            height: 100%;
-            border-right: 1px solid #f3f4f6;
-            background: #ffffff;
+            width: 280px; height: 100%; border-right: 1px solid #f3f4f6; background: #ffffff;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: fixed; left: -280px; z-index: 100;
         }
@@ -42,105 +37,63 @@
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.03); z-index: 95; display: none; backdrop-filter: blur(1px);
         }
 
-        /* 动态渐变 */
+        /* 标题动态渐变 */
         .stream-title-gradient {
-            background: var(--stream-gradient);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: var(--stream-gradient); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: flow 4s linear infinite;
         }
         .white-shimmer-text {
-            background: var(--white-gradient);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: var(--white-gradient); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: flow 3s linear infinite;
         }
         @keyframes flow { to { background-position: 200% center; } }
 
-        /* 矩形渐变按钮 */
+        /* 什么是Stream按钮 */
         .sidebar-gradient-rect {
-            background: var(--stream-gradient);
-            background-size: 200% auto;
-            color: white;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            animation: flow 6s linear infinite;
-            transition: 0.2s;
-            width: 100%;
-            margin-bottom: 12px;
-            border: none;
+            background: var(--stream-gradient); background-size: 200% auto;
+            color: white; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: 700;
+            text-align: center; cursor: pointer; animation: flow 6s linear infinite;
+            transition: 0.2s; width: 100%; margin-bottom: 12px; border: none;
         }
 
         /* 输入胶囊：锁定垂直居中 */
         .input-capsule {
-            max-width: 800px;
-            width: 100%;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 28px;
-            padding: 0 10px 0 16px;
-            display: flex;
-            align-items: center; 
-            min-height: 56px;
-            height: 56px;
-            transition: box-shadow 0.2s;
+            max-width: 800px; width: 100%; background: #ffffff; border: 1px solid #e5e7eb;
+            border-radius: 28px; padding: 0 10px 0 16px; display: flex; align-items: center; 
+            min-height: 56px; height: 56px; transition: box-shadow 0.2s;
         }
         .input-capsule:focus-within { box-shadow: 0 4px 24px rgba(0,0,0,0.06); border-color: #d1d5db; }
 
         textarea {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 16px 0; /* 垂直对齐核心 */
-            margin: 0;
-            resize: none;
-            height: 56px;
-            font-size: 15px;
-            line-height: 24px;
-            display: flex;
-            align-items: center;
+            flex: 1; background: transparent; border: none; outline: none;
+            padding: 16px 0; margin: 0; resize: none; height: 56px;
+            font-size: 15px; line-height: 24px; display: flex; align-items: center;
         }
 
-        /* 实心彩色球加载器 */
+        /* 按钮颜色 */
+        .blue-btn { background-color: var(--tech-blue) !important; color: white !important; transition: 0.2s; }
+        .red-btn { background-color: var(--accent-red) !important; color: white !important; }
+
+        /* 彩色圆球加载器 */
         .sphere-loader {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--stream-gradient);
-            background-size: 200% auto;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: var(--stream-gradient); background-size: 200% auto;
             animation: flow 3s linear infinite, sphere-pulse 1.2s ease-in-out infinite;
             box-shadow: 0 0 10px rgba(64, 150, 255, 0.2);
         }
-        @keyframes sphere-pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(0.6); opacity: 0.7; }
-        }
+        @keyframes sphere-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.6); opacity: 0.7; } }
 
-        /* 推荐提示词 - 垂直排列靠左 */
+        /* 推荐提示词 */
         .recom-chip {
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 1px solid #f3f4f6;
-            background: #ffffff;
-            font-size: 11px;
-            color: #9ca3af;
-            text-align: left;
-            transition: 0.2s;
-            cursor: pointer;
-            width: 100%;
-            max-width: 240px;
-            margin-bottom: 8px;
+            padding: 8px 14px; border-radius: 8px; border: 1px solid #f3f4f6;
+            background: #ffffff; font-size: 11px; color: #9ca3af; text-align: left;
+            transition: 0.2s; cursor: pointer; width: 100%; max-width: 240px; margin-bottom: 8px;
         }
         .recom-chip:hover { transform: translateX(6px); color: var(--tech-blue); border-color: var(--tech-blue); }
 
-        /* 复制按钮样式恢复 */
+        /* 复制按钮样式 */
         .copy-btn { 
             padding: 4px 10px; font-size: 10px; color: #9ca3af; border: 1px solid #f3f4f6; 
             border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; 
@@ -148,19 +101,11 @@
         }
         .copy-btn:hover { background: #f9fafb; color: var(--tech-blue); border-color: var(--tech-blue); }
 
-        /* 图像网格 */
+        /* 图像四宫格 */
         .image-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
-            width: 100%; 
-            margin-top: 8px;
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; width: 100%; margin-top: 8px; 
         }
-
-        .apple-card-full {
-            background: #ffffff; border-radius: 32px; padding: 40px; border: 1px solid #f1f3f6; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .apple-card-full:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.03); }
 
         .tool-chip { 
             padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 700; 
@@ -169,20 +114,19 @@
         }
         .tool-chip.active { background: var(--tech-blue); color: white; border-color: var(--tech-blue); }
 
-        .blue-btn { background: var(--tech-blue) !important; color: white !important; transition: 0.2s; }
-        .red-btn { background: var(--accent-red) !important; color: white !important; }
-
         .mode-tab { padding: 6px 20px; border-radius: 999px; font-size: 13px; font-weight: 500; color: #6b7280; transition: 0.2s; cursor: pointer; }
         .mode-tab.active { background: var(--tech-blue); color: white; }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .apple-card-full { background: #ffffff; border-radius: 32px; padding: 40px; border: 1px solid #f1f3f6; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .apple-card-full:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.03); }
+
         .message-fade { animation: fadeInUp 0.4s ease forwards; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="flex-col">
 
-    <!-- 侧边栏遮罩层 -->
     <div id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
 
     <!-- 侧边栏 -->
@@ -193,7 +137,7 @@
                 <button onclick="toggleSidebar(false)" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-sm"></i></button>
             </div>
             
-            <button onclick="newChat()" class="w-full py-3 mb-6 bg-[#4096ff] text-white rounded-2xl text-sm font-bold shadow-lg shadow-blue-500/10 active:scale-95 transition-all">
+            <button onclick="newChat()" class="w-full py-3 mb-6 bg-[#4096ff] text-white rounded-2xl text-sm font-bold shadow-lg active:scale-95 transition-all">
                 <i class="fas fa-plus text-[10px] mr-1"></i> 新建对话
             </button>
 
@@ -202,21 +146,15 @@
             <div class="mt-auto pt-6">
                 <button onclick="showLanding()" class="sidebar-gradient-rect">什么是Stream？</button>
                 <button onclick="showClearConfirm()" class="w-full py-2 text-red-400 hover:text-red-500 text-[10px] font-bold uppercase tracking-widest text-center">清空记录</button>
-                <div class="border-t border-gray-50 mt-4 pt-4 pb-2 text-center">
-                    <p class="text-[10px] text-gray-400 leading-relaxed font-medium">由独立人黄修宇制作的<br>多模态 AI 大模型</p>
-                </div>
+                <div class="border-t border-gray-50 mt-4 pt-4 text-center text-[10px] text-gray-300">由独立人黄修宇制作的多模态 AI 大模型</div>
             </div>
         </div>
     </aside>
 
-    <!-- 工作台容器 -->
+    <!-- 主容器 -->
     <div id="interface-app" class="flex-1 flex flex-col h-full">
         <header class="h-14 flex items-center justify-between px-6 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar(true)" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <i class="fas fa-bars text-gray-400 text-sm"></i>
-                </button>
-            </div>
+            <button onclick="toggleSidebar(true)" class="p-2 hover:bg-gray-100 rounded-full transition-colors"><i class="fas fa-bars text-gray-400 text-sm"></i></button>
             <div class="bg-gray-100 p-1 rounded-full flex gap-1 shadow-inner">
                 <div onclick="switchMode('thinking')" id="m-thinking" class="mode-tab active">Thinking</div>
                 <div onclick="switchMode('imagine')" id="m-imagine" class="mode-tab">Imagine</div>
@@ -224,7 +162,7 @@
             <div class="w-10"></div>
         </header>
 
-        <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar scroll-smooth" onscroll="handleScroll(this)">
+        <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
             <div id="welcome-view" class="h-full flex flex-col items-center justify-center relative">
                 <div class="text-center space-y-6">
                     <h1 class="text-7xl md:text-8xl font-black tracking-tighter stream-title-gradient">Stream</h1>
@@ -245,12 +183,11 @@
                     <div onclick="toggleTool('deep')" id="tool-deep" class="tool-chip"><i class="fas fa-brain"></i> 深度思考</div>
                 </div>
                 <div class="input-capsule">
-                    <input type="file" id="file-up" class="hidden" onchange="previewImg(this)">
-                    <button onclick="document.getElementById('file-up').click()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors"><i class="fas fa-paperclip text-sm"></i></button>
+                    <button class="w-10 h-10 flex items-center justify-center text-gray-300"><i class="fas fa-paperclip text-sm"></i></button>
                     <textarea id="prompt-in" placeholder="输入灵感描述或问题..." oninput="syncText(this)"></textarea>
                     <div class="flex items-center gap-2 ml-2">
                         <button onclick="toggleSheet(true)" id="cfg-btn" class="w-10 h-10 flex items-center justify-center text-gray-300 hover:bg-gray-100 rounded-full hidden"><i class="fas fa-sliders-h text-sm"></i></button>
-                        <button id="send-btn" onclick="handleBtnAction()" class="w-10 h-10 rounded-full blue-btn flex items-center justify-center shadow-md active:scale-90 transition-transform">
+                        <button id="send-btn" onclick="handleBtnAction()" class="w-10 h-10 rounded-full blue-btn flex items-center justify-center shadow-md active:scale-90 transition-all">
                             <i id="btn-icon" class="fas fa-arrow-up text-sm"></i>
                         </button>
                     </div>
@@ -263,48 +200,31 @@
     <div id="interface-landing" class="hidden flex-1 h-full overflow-y-auto bg-white">
         <nav class="sticky top-0 bg-white/90 backdrop-blur-md px-10 py-5 flex justify-between items-center z-50">
             <span class="text-2xl font-black tracking-tighter text-gray-900">Stream</span>
-            <button onclick="hideLanding()" class="px-6 py-2 bg-gray-900 text-white rounded-full text-sm font-bold active:scale-95 transition-all">工作台</button>
+            <button onclick="hideLanding()" class="px-6 py-2 bg-gray-900 text-white rounded-full text-sm font-bold">开启对话</button>
         </nav>
-
-        <section class="bg-[#1c1c1e] py-44 px-6 text-center">
-            <div class="max-w-4xl mx-auto space-y-8">
-                <h1 class="text-7xl md:text-9xl font-black tracking-tighter white-shimmer-text">Stream</h1>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-white opacity-90">极致精简的多模态 AI 创意工作台</h2>
-                <p class="text-lg text-gray-400 max-w-2xl mx-auto font-medium opacity-80">专注深度思考与视觉创作的沉浸式创意中心</p>
-                <div class="pt-12">
-                    <button onclick="hideLanding()" class="px-14 py-5 rounded-full text-lg font-extrabold text-white shadow-2xl transition-all active:scale-95" style="background: var(--stream-gradient); background-size: 200% auto; animation: flow 4s linear infinite;">立即体验</button>
-                    <p class="mt-6 text-[10px] text-gray-500 font-bold tracking-[0.4em] uppercase">无需登录 · 即开即用 · 隐私至上</p>
-                </div>
+        <section class="bg-[#1c1c1e] py-44 px-6 text-center text-white">
+            <h1 class="text-7xl md:text-9xl font-black tracking-tighter white-shimmer-text">Stream</h1>
+            <h2 class="text-2xl md:text-3xl font-bold opacity-80 mt-4">极致精简的多模态 AI 创意工作台</h2>
+            <div class="pt-12">
+                <button onclick="hideLanding()" class="px-14 py-5 rounded-full text-lg font-extrabold text-white shadow-2xl active:scale-95 transition-all" style="background: var(--stream-gradient); background-size: 200% auto; animation: flow 4s linear infinite;">立即体验</button>
             </div>
         </section>
-
+        
         <section class="py-20 bg-[#F5F7FA] px-6">
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
-                <!-- Thinking -->
+                <!-- Thinking Mode -->
                 <div class="apple-card-full flex flex-col gap-10">
-                    <div>
-                        <h3 class="text-3xl font-black text-gray-900 border-b-4 border-[#4096ff] pb-2 inline-block">Thinking · 深度逻辑思考</h3>
-                        <p class="mt-6 text-gray-500 leading-relaxed font-medium">极致逻辑推理模式。无论是代码调试、科学研究还是长文撰写，逻辑始终敏捷连贯。</p>
-                    </div>
-                    <div class="rounded-[32px] overflow-hidden shadow-2xl h-64 bg-gray-50 border border-gray-100">
-                        <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1000" class="w-full h-full object-cover">
-                    </div>
+                    <h3 class="text-3xl font-black text-gray-900 border-b-4 border-[#4096ff] pb-2 inline-block">Thinking · 深度逻辑思考</h3>
+                    <div class="rounded-3xl overflow-hidden h-64 shadow-xl"><img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1000" class="w-full h-full object-cover"></div>
                     <ul class="space-y-4 text-sm font-bold text-gray-600">
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-blue-500 mt-1"></i> 集成 Gemini 3 Pro-Thinking 模型</li>
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-blue-500 mt-1"></i> 支持高阶思考及深度研究</li>
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-blue-500 mt-1"></i> 多轮上下文联想功能</li>
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-blue-500 mt-1"></i> 实时联网搜索功能支持</li>
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-blue-500 mt-1"></i> 自动过滤 Markdown，纯净输出</li>
+                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 指定映射 gemini-3-pro-preview-thinking</li>
+                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 支持深度链式推理与高阶拆解模式</li>
+                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 实时联网获取全球动态资讯</li>
                     </ul>
                 </div>
-
-                <!-- Imagine -->
+                <!-- Imagine Mode -->
                 <div class="apple-card-full flex flex-col gap-10">
-                    <div>
-                        <h3 class="text-3xl font-black text-gray-900 border-b-4 border-[#4096ff] pb-2 inline-block">Imagine · 专业图像生成</h3>
-                        <p class="mt-6 text-gray-500 leading-relaxed font-medium">顶级视觉生成。让文字瞬间显现为 4K 分辨率的高级图像，四宫格输出确保灵感无死角。</p>
-                    </div>
-                    <!-- Imagine Image Fix: High Availability Images -->
+                    <h3 class="text-3xl font-black text-gray-900 border-b-4 border-[#4096ff] pb-2 inline-block">Imagine · 专业图像生成</h3>
                     <div class="grid grid-cols-2 gap-3 h-64">
                         <div class="rounded-2xl overflow-hidden shadow-sm"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=300" class="w-full h-full object-cover"></div>
                         <div class="rounded-2xl overflow-hidden shadow-sm"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300" class="w-full h-full object-cover"></div>
@@ -312,52 +232,43 @@
                         <div class="rounded-2xl overflow-hidden shadow-sm"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=300" class="w-full h-full object-cover"></div>
                     </div>
                     <ul class="space-y-4 text-sm font-bold text-gray-600">
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-purple-500 mt-1"></i> 集成 doubao-Seedance 4.5 引擎</li>
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-purple-500 mt-1"></i> 四宫格并行输出，多倍效率</li>
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-purple-500 mt-1"></i> 极致 4K 分辨率渲染能力</li>
-                        <li class="flex gap-3"><i class="fas fa-check-circle text-purple-500 mt-1"></i> 多种艺术倾向风格预设</li>
+                        <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> 集成 doubao-Seedance 4.5 引擎</li>
+                        <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> 支持最高 4K 分辨率及四宫格渲染</li>
                     </ul>
                 </div>
             </div>
         </section>
 
-        <!-- Advantages -->
+        <!-- 特点展示 -->
         <section class="py-32 px-10 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
-                <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-blue-500 shadow-sm"><i class="fas fa-shield-halved text-2xl"></i></div>
+                <i class="fas fa-shield-halved text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">匿名隐私</h4>
-                <p class="text-xs text-gray-400 font-medium">无迹可寻。我们不收集个人身份，让创意在安全屏障内自由流动。</p>
+                <p class="text-xs text-gray-400 font-medium">零留痕访问，绝对隐私屏障。</p>
             </div>
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
-                <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-blue-500 shadow-sm"><i class="fas fa-hand-paper text-2xl"></i></div>
+                <i class="fas fa-hand-paper text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">实时打断</h4>
-                <p class="text-xs text-gray-400 font-medium">毫秒拦截。创新的任务中止技术，不满意即停，掌控每一分秒。</p>
+                <p class="text-xs text-gray-400 font-medium">任务秒级拦截，掌控节奏。</p>
             </div>
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
-                <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-blue-500 shadow-sm"><i class="fas fa-wand-magic-sparkles text-2xl"></i></div>
+                <i class="fas fa-wand-magic-sparkles text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">灵感卡片</h4>
-                <p class="text-xs text-gray-400 font-medium">随机引导。每次遇见皆为全新视觉引导，击碎任何创作僵局。</p>
+                <p class="text-xs text-gray-400 font-medium">随机触发的跨界创意引导。</p>
             </div>
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
-                <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center text-blue-500 shadow-sm"><i class="fas fa-database text-2xl"></i></div>
+                <i class="fas fa-database text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">本地存储</h4>
-                <p class="text-xs text-gray-400 font-medium">持久化管理。对话记录深度存储于本地缓存，刷新亦如初见。</p>
+                <p class="text-xs text-gray-400 font-medium">离线数据管理，历史记录常驻。</p>
             </div>
         </section>
-
-        <!-- Footer -->
-        <footer class="py-32 bg-[#1c1c1e] text-center">
-            <h3 class="text-4xl font-extrabold text-white mb-10 tracking-tight">准备好开启高效创作了吗？</h3>
-            <button onclick="hideLanding()" class="cta-gradient-btn" style="padding: 18px 60px;">立即体验 Stream</button>
-            <p class="mt-20 text-[10px] text-gray-500 font-bold uppercase tracking-[0.4em]">Designed and Built by Huang Xiuyu</p>
-        </footer>
     </div>
 
-    <!-- 模态框逻辑 -->
+    <!-- 弹窗 -->
     <div id="modal" class="fixed inset-0 z-[200] bg-black/10 backdrop-blur-sm hidden items-center justify-center">
-        <div class="bg-white p-8 rounded-[32px] shadow-2xl max-w-sm w-full mx-4">
-            <h3 class="text-lg font-bold mb-2 text-center text-gray-800">确认清空记录？</h3>
-            <p class="text-sm text-gray-500 mb-8 text-center">历史对话将被永久移除。</p>
+        <div class="bg-white p-8 rounded-[32px] shadow-2xl max-w-sm w-full mx-4 text-center">
+            <h3 class="text-lg font-bold mb-2">确认清空？</h3>
+            <p class="text-sm text-gray-500 mb-8 leading-relaxed">对话历史将被从本地永久移除。</p>
             <div class="flex gap-3">
                 <button onclick="hideClearConfirm()" class="flex-1 py-3 bg-gray-100 rounded-2xl text-sm font-bold">取消</button>
                 <button onclick="clearEverything()" class="flex-1 py-3 bg-red-500 text-white rounded-2xl text-sm font-bold">确认</button>
@@ -365,23 +276,23 @@
         </div>
     </div>
 
-    <!-- Imagine 设置面板 -->
+    <!-- 设置面板 -->
     <div id="sheet-bg" class="fixed inset-0 bg-black/5 z-[105] hidden" onclick="toggleSheet(false)"></div>
     <div id="sheet" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[40px] transform translate-y-full transition-transform duration-300 z-[110] shadow-2xl max-h-[85vh] overflow-y-auto">
         <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto my-5"></div>
         <div class="p-10 space-y-10">
             <div>
-                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">画面比例</h4>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">画布比例</h4>
                 <div class="flex flex-wrap gap-3">
-                    <button onclick="setIm('ratio', '1024x1024')" id="r-1024x1024" class="px-6 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">1:1 Square</button>
-                    <button onclick="setIm('ratio', '1280x720')" id="r-1280x720" class="px-6 py-3 border rounded-2xl text-sm">16:9 Wide</button>
-                    <button onclick="setIm('ratio', '720x1280')" id="r-720x1280" class="px-6 py-3 border rounded-2xl text-sm">9:16 Portrait</button>
+                    <button onclick="setIm('ratio', '1024x1024')" id="r-1024x1024" class="px-6 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">1:1</button>
+                    <button onclick="setIm('ratio', '1280x720')" id="r-1280x720" class="px-6 py-3 border rounded-2xl text-sm">16:9</button>
+                    <button onclick="setIm('ratio', '720x1280')" id="r-720x1280" class="px-6 py-3 border rounded-2xl text-sm">9:16</button>
                 </div>
             </div>
             <div>
-                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">渲染精度</h4>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">画质精度</h4>
                 <div class="flex gap-3">
-                    <button onclick="setIm('res', '2K')" id="res-2K" class="px-8 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">2K 增强</button>
+                    <button onclick="setIm('res', '2K')" id="res-2K" class="px-8 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">2K 标准</button>
                     <button onclick="setIm('res', '4K')" id="res-4K" class="px-8 py-3 border rounded-2xl text-sm">4K 极致</button>
                 </div>
             </div>
@@ -394,45 +305,32 @@
                     <button onclick="setIm('style', 'realistic')" id="st-realistic" class="p-3 border rounded-xl text-xs">写实</button>
                 </div>
             </div>
-            <button onclick="toggleSheet(false)" class="w-full py-5 bg-gray-900 text-white rounded-2xl font-bold">应用配置</button>
+            <button onclick="toggleSheet(false)" class="w-full py-5 bg-gray-900 text-white rounded-2xl font-bold shadow-xl">保存配置</button>
         </div>
     </div>
 
     <script>
+        // 专项部署配置
         const apiKey = "sk-tREuwxY6308UzpstpZwm4WbrfKD3W42fPL552fnWn9suGRjc"; 
-        const IM_API = "https://api.apimart.ai/v1/chat/completions";
-        const THINK_MODEL = "gemini-3-pro-preview-thinking";
-        
-        const PROMPT_LIB = {
-            thinking: ['制定健身计划', '写一段科幻小说', '解释量子物理', '提高效率的技巧', '推荐心理学书', '区块链解析', '如何写简历', '治愈系文案'],
-            imagine: ['极光冰川', '未来赛博城', '莫奈风格画', '梦幻云中城堡', '微距昆虫摄影', '霓虹街道', '极简Logo', '写实自然']
-        };
+        const IM_API = "https://api.apimart.ai/v1/images/generations";
+        const CHAT_API = "https://api.apimart.ai/v1/chat/completions";
+        const THINK_MODEL = "gemini-3-pro-preview-thinking"; 
+        const AUTH_HEADER = "Bearer " + apiKey;
 
         let app = {
             mode: 'thinking', busy: false, interrupted: false,
             tools: { search: false, deep: false },
             cfg: { ratio: '1024x1024', res: '2K', style: 'none' },
-            history: JSON.parse(localStorage.getItem('stream_v25_db') || '[]'),
-            session: [{ role: 'user', parts: [{ text: '你是由独立人黄修宇制作的多模态 AI 大模型 Stream。' }]}],
+            history: JSON.parse(localStorage.getItem('stream_v37_db') || '[]'),
+            session: [{ role: 'system', content: '你是由独立人黄修宇制作的多模态 AI 大模型 Stream。回答简洁。只有在询问开发者身份时才表明。' }],
             currentId: null, abortCtrl: null
         };
 
-        window.onload = () => { renderRecom(); renderHistory(); };
+        window.onload = () => { renderRecom(); renderHistory(); syncText(document.getElementById('prompt-in')); };
 
-        function toggleSidebar(open) { 
-            document.getElementById('sidebar').classList.toggle('open', open); 
-            document.getElementById('sidebar-overlay').style.display = open ? 'block' : 'none';
-        }
-
-        function showLanding() {
-            document.getElementById('interface-app').classList.add('hidden');
-            document.getElementById('interface-landing').classList.remove('hidden');
-            toggleSidebar(false);
-        }
-        function hideLanding() {
-            document.getElementById('interface-landing').classList.add('hidden');
-            document.getElementById('interface-app').classList.remove('hidden');
-        }
+        function toggleSidebar(open) { document.getElementById('sidebar').classList.toggle('open', open); document.getElementById('sidebar-overlay').style.display = open ? 'block' : 'none'; }
+        function showLanding() { document.getElementById('interface-app').classList.add('hidden'); document.getElementById('interface-landing').classList.remove('hidden'); toggleSidebar(false); }
+        function hideLanding() { document.getElementById('interface-landing').classList.add('hidden'); document.getElementById('interface-app').classList.remove('hidden'); }
 
         function switchMode(m) {
             if(app.mode === m) return;
@@ -446,15 +344,16 @@
 
         function clearChatUI() {
             document.getElementById('welcome-view').classList.remove('hidden');
-            document.getElementById('chat-flow').classList.add('hidden');
-            document.getElementById('chat-flow').innerHTML = '';
-            app.session = [{ role: 'user', parts: [{ text: '你是由独立人黄修宇制作的多模态 AI 大模型 Stream。' }]}];
+            const flow = document.getElementById('chat-flow');
+            flow.classList.add('hidden'); flow.innerHTML = '';
+            app.session = [{ role: 'system', content: '你是由独立人黄修宇制作的多模态 AI 大模型 Stream。' }];
             app.currentId = null;
         }
 
         function renderRecom() {
             const container = document.getElementById('recom-container');
-            const shuffled = PROMPT_LIB[app.mode].sort(() => 0.5 - Math.random()).slice(0, 3);
+            const pool = ['写一段短视频脚本', '解释广义相对论', '制定一份健身计划', '提高专注力的技巧', '分析未来科技趋势', '如何高效学习Python'];
+            const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
             container.innerHTML = shuffled.map(t => `<button onclick="injectText('${t}')" class="recom-chip">${t}</button>`).join('');
         }
 
@@ -466,81 +365,76 @@
             if (h > 24) el.style.height = Math.min(h, 200) + 'px';
         }
 
-        function toggleTool(t) {
-            app.tools[t] = !app.tools[t];
-            document.getElementById(`tool-${t}`).classList.toggle('active', app.tools[t]);
-        }
-
-        function toggleSheet(open) {
-            document.getElementById('sheet').style.transform = open ? 'translateY(0)' : 'translateY(100%)';
-            document.getElementById('sheet-bg').classList.toggle('hidden', !open);
-        }
-
-        function setIm(k, v) {
-            app.cfg[k] = v;
-            const prefix = k === 'ratio' ? 'r-' : (k === 'res' ? 'res-' : 'st-');
-            document.querySelectorAll(`[id^="${prefix}"]`).forEach(b => b.classList.remove('active-c', 'bg-blue-50', 'border-blue-200', 'text-blue-600', 'font-bold'));
-            document.getElementById(`${prefix}${v}`).classList.add('active-c', 'bg-blue-50', 'border-blue-200', 'text-blue-600', 'font-bold');
-        }
+        function toggleTool(t) { app.tools[t] = !app.tools[t]; document.getElementById(`tool-${t}`).classList.toggle('active', app.tools[t]); }
+        function toggleSheet(open) { document.getElementById('sheet').style.transform = open ? 'translateY(0)' : 'translateY(100%)'; document.getElementById('sheet-bg').classList.toggle('hidden', !open); }
+        function setIm(k, v) { app.cfg[k] = v; const prefix = k === 'ratio' ? 'r-' : (k === 'res' ? 'res-' : 'st-'); document.querySelectorAll(`[id^="${prefix}"]`).forEach(b => b.classList.remove('active-c', 'bg-blue-50', 'border-blue-200', 'text-blue-600', 'font-bold')); document.getElementById(`${prefix}${v}`).classList.add('active-c', 'bg-blue-50', 'border-blue-200', 'text-blue-600', 'font-bold'); }
 
         function handleBtnAction() { if (app.busy) stopResponse(); else onSend(); }
-
-        function stopResponse() {
-            if (app.abortCtrl) app.abortCtrl.abort();
-            app.interrupted = true; setBusy(false);
-            const hint = document.createElement('p');
-            hint.className = 'text-[10px] text-red-400 mt-2 font-bold message-fade';
-            hint.innerText = '你已停止回答';
-            document.getElementById('chat-flow').appendChild(hint);
-        }
+        function stopResponse() { if (app.abortCtrl) app.abortCtrl.abort(); app.interrupted = true; setBusy(false); const flow = document.getElementById('chat-flow'); const hint = document.createElement('p'); hint.className = 'text-[10px] text-red-400 mt-2 font-bold message-fade'; hint.innerText = '你已停止回答'; flow.appendChild(hint); }
 
         async function onSend() {
             const input = document.getElementById('prompt-in');
             const prompt = input.value.trim();
-            if(!prompt) return;
+            if(!prompt || app.busy) return;
             app.interrupted = false; app.abortCtrl = new AbortController();
             setBusy(true);
             document.getElementById('welcome-view').classList.add('hidden');
             document.getElementById('chat-flow').classList.remove('hidden');
             const id = Date.now(); if(!app.currentId) app.currentId = id;
             appendMsg(id, prompt, 'user');
-            input.value = ''; syncText(input);
+            input.value = ''; syncText(document.getElementById('prompt-in'));
             if(app.mode === 'thinking') await callThink(prompt, id + 1);
             else await callIm(prompt, id + 1);
             setBusy(false);
         }
 
         function setBusy(val) {
-            app.busy = val;
-            const btn = document.getElementById('send-btn');
-            const icon = document.getElementById('btn-icon');
-            if (val) {
-                btn.className = "w-10 h-10 rounded-full red-btn flex items-center justify-center shadow-md";
-                icon.className = "fas fa-stop text-xs";
-            } else {
-                btn.className = "w-10 h-10 rounded-full blue-btn flex items-center justify-center shadow-md";
-                icon.className = "fas fa-arrow-up text-sm";
-            }
+            app.busy = val; const btn = document.getElementById('send-btn'); const icon = document.getElementById('btn-icon');
+            if (val) { btn.className = "w-10 h-10 rounded-full red-btn flex items-center justify-center shadow-md"; icon.className = "fas fa-stop text-xs"; } 
+            else { btn.className = "w-10 h-10 rounded-full blue-btn flex items-center justify-center shadow-md"; icon.className = "fas fa-arrow-up text-sm"; }
         }
 
+        // 核心修复：Thinking 跨域兼容调用
         async function callThink(prompt, id) {
             const wrap = appendMsg(id, '', 'ai');
             const loader = createSphereLoader(wrap, app.tools.deep ? '深度思考中…' : '正在思考中…');
             const content = document.createElement('div');
             content.className = 'text-[15px] leading-relaxed text-gray-800 opacity-0';
             wrap.appendChild(content);
+
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${THINK_MODEL}:generateContent?key=${apiKey}`;
-                let sys = "你是由独立人黄修宇制作的多模态 AI 大模型 Stream。回答简洁。只有在询问开发者身份时才介绍开发者。";
-                if(app.tools.deep) sys += " 开启深度逻辑分析。";
-                app.session.push({ role: 'user', parts: [{ text: prompt }] });
-                const body = { contents: app.session, systemInstruction: { parts: [{ text: sys }] } };
-                if(app.tools.search) body.tools = [{ "google_search": {} }];
-                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: app.abortCtrl.signal }).then(r => r.json());
-                let text = res.candidates?.[0]?.content?.parts?.[0]?.text || "暂无返回结果。";
+                let context = [...app.session];
+                if(app.tools.deep) context[0].content += " 请进行全方位的深度逻辑拆解与推理分析。";
+                context.push({ role: 'user', content: prompt });
+
+                const response = await fetch(CHAT_API, {
+                    method: 'POST',
+                    mode: 'cors', // 强制跨域模式
+                    credentials: 'omit', // 忽略证书
+                    referrerPolicy: 'no-referrer', // 屏蔽来源，防止服务端拦截
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': AUTH_HEADER 
+                    },
+                    body: JSON.stringify({ 
+                        model: THINK_MODEL, 
+                        messages: context,
+                        temperature: 0.7 
+                    }),
+                    signal: app.abortCtrl.signal
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API 异常 (${response.status}): ${errorText.substring(0, 100)}`);
+                }
+
+                const res = await response.json();
+                let text = res.choices?.[0]?.message?.content || "抱歉，目前服务连接不稳定，请稍后重试。";
                 text = text.replace(/[#*`~]/g, '').trim();
+                
                 if (app.interrupted) return;
-                app.session.push({ role: 'model', parts: [{ text }] });
+                app.session.push({ role: 'user', content: prompt }, { role: 'assistant', content: text });
                 loader.remove(); content.classList.replace('opacity-0', 'message-fade');
                 await typeText(text, content);
                 addCopy(wrap, text);
@@ -552,114 +446,89 @@
             }
         }
 
+        // 核心修复：Imagine 跨域兼容调用及四宫格渲染
         async function callIm(prompt, id) {
             const wrap = appendMsg(id, '', 'ai', true);
             const loader = createSphereLoader(wrap, '正在绘图中…');
             const grid = wrap.querySelector('.image-grid');
+
             try {
                 let p = prompt + (app.cfg.res === '4K' ? ', ultra-detailed 4k resolution' : '');
-                if(app.cfg.style !== 'none') p += `, ${app.cfg.style} art style`;
-                const res = await fetch(IM_API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer sk-tREuwxY6308UzpstpZwm4WbrfKD3W42fPL552fnWn9suGRjc` }, body: JSON.stringify({ model: "doubao-seedance-4-5", prompt: p, size: app.cfg.ratio, n: 4 }), signal: app.abortCtrl.signal }).then(r => r.json());
+                if(app.cfg.style !== 'none') {
+                    const styles = { watercolor: 'watercolor painting style', cyberpunk: 'cyberpunk neon aesthetic', realistic: 'hyper-realistic photography' };
+                    p += `, in ${styles[app.cfg.style]}`;
+                }
+
+                const response = await fetch(IM_API, {
+                    method: 'POST',
+                    mode: 'cors',
+                    credentials: 'omit',
+                    referrerPolicy: 'no-referrer',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': AUTH_HEADER },
+                    body: JSON.stringify({ model: "doubao-seedance-4-5", prompt: p, size: app.cfg.ratio, n: 4 }),
+                    signal: app.abortCtrl.signal
+                });
+                
+                if (!response.ok) throw new Error("绘图服务暂时不可用");
+                
+                const res = await response.json();
                 if (app.interrupted) return;
                 loader.remove();
-                if(res.data) {
+
+                if(res.data && res.data.length > 0) {
                     const urls = res.data.map(i => i.url);
-                    grid.innerHTML = urls.map(url => `<div class="relative group rounded-2xl overflow-hidden aspect-square bg-gray-50 border border-gray-100"><img src="${url}" class="w-full h-full object-cover shadow-sm"></div>`).join('');
-                    app.session.push({ role: 'model', parts: [{ text: `[Images: ${JSON.stringify(urls)}]` }] });
+                    // 彻底修复 4 张渲染逻辑
+                    grid.innerHTML = urls.map(url => `
+                        <div class="relative group rounded-2xl overflow-hidden aspect-square shadow-sm border border-gray-100 bg-gray-50">
+                            <img src="${url}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
+                        </div>
+                    `).join('');
+                    app.session.push({ role: 'assistant', content: `[Images: ${JSON.stringify(urls)}]` });
                     saveHistory(prompt);
+                } else { 
+                    grid.innerHTML = `<p class="col-span-2 text-xs text-red-500 text-center">生成失败: ${res.error?.message || '未知错误'}</p>`; 
                 }
-            } catch (e) { if (e.name === 'AbortError') return; loader.remove(); grid.innerHTML = `<p class="col-span-2 text-xs text-red-500 text-center py-4">绘图失败</p>`; }
+            } catch (e) { if (e.name === 'AbortError') return; loader.remove(); grid.innerHTML = `<p class="col-span-2 text-xs text-red-500 text-center py-4">接口超时，请重试</p>`; }
         }
 
-        function createSphereLoader(parent, text) {
-            const div = document.createElement('div');
-            div.className = 'flex items-center gap-3 py-4 message-fade';
-            div.innerHTML = `<div class="sphere-loader"></div><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${text}</span>`;
-            parent.appendChild(div); return div;
-        }
-
-        function addCopy(parent, text) {
-            const btn = document.createElement('button');
-            btn.className = 'copy-btn message-fade';
-            btn.innerHTML = `<i class="far fa-copy"></i> 复制内容`;
-            btn.onclick = () => {
-                const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el);
-                el.select(); document.execCommand('copy'); document.body.removeChild(el);
-                btn.innerHTML = `<i class="fas fa-check"></i> 已复制`;
-                setTimeout(() => btn.innerHTML = `<i class="far fa-copy"></i> 复制内容`, 2000);
-            };
-            parent.appendChild(btn);
-        }
-
-        async function typeText(text, el) {
-            let i = 0; return new Promise(res => {
-                const timer = setInterval(() => { if (app.interrupted) { clearInterval(timer); res(); return; } if (i < text.length) { el.innerText += text.charAt(i); i++; scrollToBottom(); } else { clearInterval(timer); res(); } }, 12);
-            });
-        }
-
-        function appendMsg(id, content, role, isIm = false) {
-            const flow = document.getElementById('chat-flow');
-            const div = document.createElement('div'); div.id = `msg-${id}`;
-            div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-fade`;
-            if(role === 'user') div.innerHTML = `<div class="bg-gray-50 px-5 py-3 rounded-[24px] rounded-tr-none text-sm text-gray-700 border border-gray-100">${content}</div>`;
-            else div.innerHTML = isIm ? `<div class="w-full"><div class="image-grid"></div></div>` : `<div class="w-full"></div>`;
-            flow.appendChild(div); scrollToBottom();
-            return role === 'ai' ? div.querySelector('div') : div;
-        }
+        function createSphereLoader(parent, text) { const div = document.createElement('div'); div.className = 'flex items-center gap-3 py-4 message-fade'; div.innerHTML = `<div class="sphere-loader"></div><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${text}</span>`; parent.appendChild(div); return div; }
+        function addCopy(parent, text) { const btn = document.createElement('button'); btn.className = 'copy-btn message-fade'; btn.innerHTML = `<i class="far fa-copy"></i> 复制内容`; btn.onclick = () => { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerHTML = `<i class="fas fa-check"></i> 已复制`; setTimeout(() => btn.innerHTML = `<i class="far fa-copy"></i> 复制内容`, 2000); }; parent.appendChild(btn); }
+        async function typeText(text, el) { let i = 0; return new Promise(res => { const timer = setInterval(() => { if (app.interrupted) { clearInterval(timer); res(); return; } if (i < text.length) { el.innerText += text.charAt(i); i++; scrollToBottom(); } else { clearInterval(timer); res(); } }, 12); }); }
+        function appendMsg(id, content, role, isIm = false) { const flow = document.getElementById('chat-flow'); const div = document.createElement('div'); div.id = `msg-${id}`; div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} message-fade`; if(role === 'user') div.innerHTML = `<div class="bg-gray-50 px-5 py-3 rounded-[24px] rounded-tr-none text-sm text-gray-700 border border-gray-100">${content}</div>`; else div.innerHTML = isIm ? `<div class="w-full"><div class="image-grid"></div></div>` : `<div class="w-full"></div>`; flow.appendChild(div); scrollToBottom(); return role === 'ai' ? div.querySelector('div') : div; }
 
         function saveHistory(t) {
             if(!app.currentId) return;
             const entry = { id: app.currentId, title: t.substring(0, 10), session: JSON.parse(JSON.stringify(app.session)), mode: app.mode };
             const idx = app.history.findIndex(h => h.id === app.currentId);
             if(idx > -1) app.history[idx] = entry; else app.history.unshift(entry);
-            localStorage.setItem('stream_v25_db', JSON.stringify(app.history)); renderHistory();
+            localStorage.setItem('stream_v37_db', JSON.stringify(app.history)); renderHistory();
         }
 
         function loadHistory(id) {
             const item = app.history.find(h => h.id === id); if(!item) return;
-            app.currentId = item.id; app.session = JSON.parse(JSON.stringify(item.session)); app.mode = item.mode || 'thinking';
-            
-            // 重置 UI
-            document.getElementById('welcome-view').classList.add('hidden');
+            app.currentId = item.id; app.session = JSON.parse(JSON.stringify(item.session)); app.mode = item.mode;
+            hideLanding();
+            document.getElementById('welcome-view').classList.add('hidden'); 
             const flow = document.getElementById('chat-flow');
-            flow.classList.remove('hidden');
-            flow.innerHTML = '';
-            
-            // 模式同步
-            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(`m-${app.mode}`).classList.add('active');
-            document.getElementById('thinking-tools').style.display = app.mode === 'thinking' ? 'flex' : 'none';
-
+            flow.classList.remove('hidden'); flow.innerHTML = '';
             app.session.forEach((msg, idx) => {
-                if(idx === 0) return;
-                const text = msg.parts[0].text;
-                const isIm = text.startsWith('[Images:');
-                const role = msg.role === 'user' ? 'user' : 'ai';
-                const wrap = appendMsg(Date.now() + idx, isIm ? '' : text, role, isIm);
-                if(isIm) {
-                    const urls = JSON.parse(text.slice(9, -1));
-                    wrap.querySelector('.image-grid').innerHTML = urls.map(u => `<div class="rounded-2xl overflow-hidden aspect-square shadow-sm"><img src="${u}" class="w-full h-full object-cover"></div>`).join('');
-                } else if (msg.role === 'model') addCopy(wrap.parentElement, text);
+                if(msg.role === 'system') return;
+                const text = msg.content || ""; const isIm = text.startsWith('[Images:');
+                const wrap = appendMsg(Date.now()+idx, isIm ? '' : text, msg.role==='user'?'user':'ai', isIm);
+                if(isIm) { const urls = JSON.parse(text.slice(9, -1)); wrap.querySelector('.image-grid').innerHTML = urls.map(u => `<div class="rounded-2xl overflow-hidden aspect-square shadow-sm"><img src="${u}" referrerpolicy="no-referrer" class="w-full h-full object-cover"></div>`).join(''); }
+                else if(msg.role === 'assistant') addCopy(wrap.parentElement, text);
             });
             toggleSidebar(false);
             scrollToBottom();
         }
 
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = app.history.map(item => `<div onclick="loadHistory(${item.id})" class="p-3 text-xs text-gray-400 hover:bg-gray-50 rounded-xl truncate cursor-pointer transition-colors"><i class="far fa-message mr-3 opacity-30"></i> ${item.title}</div>`).join('');
-        }
-
-        function clearEverything() { localStorage.removeItem('stream_v25_db'); app.history = []; renderHistory(); clearChatUI(); hideClearConfirm(); }
-        function newChat() { clearChatUI(); toggleSidebar(false); }
+        function renderHistory() { const list = document.getElementById('history-list'); list.innerHTML = app.history.map(item => `<div onclick="loadHistory(${item.id})" class="p-3 text-xs text-gray-400 hover:bg-gray-50 rounded-xl truncate cursor-pointer transition-colors"><i class="far fa-message mr-3 opacity-30"></i> ${item.title}</div>`).join(''); }
+        function clearEverything() { localStorage.removeItem('stream_v37_db'); app.history = []; renderHistory(); clearChatUI(); hideClearConfirm(); }
+        function newChat() { clearChatUI(); hideLanding(); toggleSidebar(false); }
         function showClearConfirm() { document.getElementById('modal').classList.remove('hidden').classList.add('flex'); }
         function hideClearConfirm() { document.getElementById('modal').classList.add('hidden').classList.remove('flex'); }
         function scrollToTop() { document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' }); }
         function scrollToBottom() { const m = document.getElementById('main-content'); m.scrollTo({ top: m.scrollHeight, behavior: 'smooth' }); }
-        function handleScroll(el) {}
-        function dlImg(url) { const a = document.createElement('a'); a.href = url; a.download = `stream-${Date.now()}.png`; a.click(); }
-        function previewImg(i) {}
-
         document.getElementById('prompt-in').addEventListener('keydown', e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleBtnAction(); } });
     </script>
 </body>
