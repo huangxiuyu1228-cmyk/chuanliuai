@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 全局防盗链与 CORS 辅助 -->
+    <!-- 核心部署修复：防止图片服务器防盗链检查 -->
     <meta name="referrer" content="no-referrer">
     <title>Stream - AI 工作台</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +37,7 @@
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.03); z-index: 95; display: none; backdrop-filter: blur(1px);
         }
 
-        /* 标题动态渐变 */
+        /* 渐变标题 */
         .stream-title-gradient {
             background: var(--stream-gradient); background-size: 200% auto;
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -50,7 +50,7 @@
         }
         @keyframes flow { to { background-position: 200% center; } }
 
-        /* 什么是Stream按钮 */
+        /* 侧边栏彩色按钮 */
         .sidebar-gradient-rect {
             background: var(--stream-gradient); background-size: 200% auto;
             color: white; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: 700;
@@ -58,7 +58,7 @@
             transition: 0.2s; width: 100%; margin-bottom: 12px; border: none;
         }
 
-        /* 输入胶囊：锁定垂直居中 */
+        /* 输入胶囊：极致垂直居中 */
         .input-capsule {
             max-width: 800px; width: 100%; background: #ffffff; border: 1px solid #e5e7eb;
             border-radius: 28px; padding: 0 10px 0 16px; display: flex; align-items: center; 
@@ -72,11 +72,11 @@
             font-size: 15px; line-height: 24px; display: flex; align-items: center;
         }
 
-        /* 按钮颜色 */
-        .blue-btn { background-color: var(--tech-blue) !important; color: white !important; transition: 0.2s; }
+        /* 按钮色彩 */
+        .blue-btn { background-color: var(--tech-blue) !important; color: white !important; }
         .red-btn { background-color: var(--accent-red) !important; color: white !important; }
 
-        /* 彩色圆球加载器 */
+        /* 实心彩色加载球 */
         .sphere-loader {
             width: 14px; height: 14px; border-radius: 50%;
             background: var(--stream-gradient); background-size: 200% auto;
@@ -85,7 +85,7 @@
         }
         @keyframes sphere-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.6); opacity: 0.7; } }
 
-        /* 推荐提示词 */
+        /* 推荐提示词磁贴 */
         .recom-chip {
             padding: 8px 14px; border-radius: 8px; border: 1px solid #f3f4f6;
             background: #ffffff; font-size: 11px; color: #9ca3af; text-align: left;
@@ -97,15 +97,12 @@
         .copy-btn { 
             padding: 4px 10px; font-size: 10px; color: #9ca3af; border: 1px solid #f3f4f6; 
             border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; 
-            gap: 4px; width: fit-content; margin-top: 12px; cursor: pointer; 
+            gap: 4px; width: fit-content; margin-top: 10px; cursor: pointer; 
         }
         .copy-btn:hover { background: #f9fafb; color: var(--tech-blue); border-color: var(--tech-blue); }
 
-        /* 图像四宫格 */
-        .image-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; width: 100%; margin-top: 8px; 
-        }
+        /* 图像网格 2x2 */
+        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; margin-top: 8px; }
 
         .tool-chip { 
             padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 700; 
@@ -151,7 +148,7 @@
         </div>
     </aside>
 
-    <!-- 主容器 -->
+    <!-- 工作台容器 -->
     <div id="interface-app" class="flex-1 flex flex-col h-full">
         <header class="h-14 flex items-center justify-between px-6 bg-white/80 backdrop-blur-md sticky top-0 z-50">
             <button onclick="toggleSidebar(true)" class="p-2 hover:bg-gray-100 rounded-full transition-colors"><i class="fas fa-bars text-gray-400 text-sm"></i></button>
@@ -200,7 +197,7 @@
     <div id="interface-landing" class="hidden flex-1 h-full overflow-y-auto bg-white">
         <nav class="sticky top-0 bg-white/90 backdrop-blur-md px-10 py-5 flex justify-between items-center z-50">
             <span class="text-2xl font-black tracking-tighter text-gray-900">Stream</span>
-            <button onclick="hideLanding()" class="px-6 py-2 bg-gray-900 text-white rounded-full text-sm font-bold">开启对话</button>
+            <button onclick="hideLanding()" class="px-6 py-2 bg-gray-900 text-white rounded-full text-sm font-bold">工作台</button>
         </nav>
         <section class="bg-[#1c1c1e] py-44 px-6 text-center text-white">
             <h1 class="text-7xl md:text-9xl font-black tracking-tighter white-shimmer-text">Stream</h1>
@@ -212,17 +209,15 @@
         
         <section class="py-20 bg-[#F5F7FA] px-6">
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
-                <!-- Thinking Mode -->
                 <div class="apple-card-full flex flex-col gap-10">
                     <h3 class="text-3xl font-black text-gray-900 border-b-4 border-[#4096ff] pb-2 inline-block">Thinking · 深度逻辑思考</h3>
                     <div class="rounded-3xl overflow-hidden h-64 shadow-xl"><img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1000" class="w-full h-full object-cover"></div>
                     <ul class="space-y-4 text-sm font-bold text-gray-600">
-                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 指定映射 gemini-3-pro-preview-thinking</li>
-                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 支持深度链式推理与高阶拆解模式</li>
-                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 实时联网获取全球动态资讯</li>
+                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 集成 Google 原生 gemini-3-flash-preview</li>
+                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 极速响应，支持深度链式推理逻辑</li>
+                        <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> 指定开发者身份：独立人黄修宇</li>
                     </ul>
                 </div>
-                <!-- Imagine Mode -->
                 <div class="apple-card-full flex flex-col gap-10">
                     <h3 class="text-3xl font-black text-gray-900 border-b-4 border-[#4096ff] pb-2 inline-block">Imagine · 专业图像生成</h3>
                     <div class="grid grid-cols-2 gap-3 h-64">
@@ -232,48 +227,35 @@
                         <div class="rounded-2xl overflow-hidden shadow-sm"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=300" class="w-full h-full object-cover"></div>
                     </div>
                     <ul class="space-y-4 text-sm font-bold text-gray-600">
-                        <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> 集成 doubao-Seedance 4.5 引擎</li>
-                        <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> 支持最高 4K 分辨率及四宫格渲染</li>
+                        <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> 搭载 doubao-Seedance 4.5 视觉引擎</li>
+                        <li><i class="fas fa-check-circle text-purple-500 mr-2"></i> 四宫格并行输出，4K 极致画质细节</li>
                     </ul>
                 </div>
             </div>
         </section>
 
-        <!-- 特点展示 -->
         <section class="py-32 px-10 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
                 <i class="fas fa-shield-halved text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">匿名隐私</h4>
-                <p class="text-xs text-gray-400 font-medium">零留痕访问，绝对隐私屏障。</p>
+                <p class="text-xs text-gray-400 font-medium">无需注册，绝对隐私屏蔽，灵感安全无忧。</p>
             </div>
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
                 <i class="fas fa-hand-paper text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">实时打断</h4>
-                <p class="text-xs text-gray-400 font-medium">任务秒级拦截，掌控节奏。</p>
+                <p class="text-xs text-gray-400 font-medium">任务秒级拦截。不满意即刻停止，精准掌控时长。</p>
             </div>
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
                 <i class="fas fa-wand-magic-sparkles text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">灵感卡片</h4>
-                <p class="text-xs text-gray-400 font-medium">随机触发的跨界创意引导。</p>
+                <p class="text-xs text-gray-400 font-medium">随机触发创意引导，打破僵局，激发无限可能。</p>
             </div>
             <div class="bg-gray-50 p-10 rounded-[48px] text-center space-y-4">
                 <i class="fas fa-database text-2xl text-blue-500"></i>
                 <h4 class="font-bold text-gray-900">本地存储</h4>
-                <p class="text-xs text-gray-400 font-medium">离线数据管理，历史记录常驻。</p>
+                <p class="text-xs text-gray-400 font-medium">持久化本地缓存管理。对话记录常驻，刷新亦如见。</p>
             </div>
         </section>
-    </div>
-
-    <!-- 弹窗 -->
-    <div id="modal" class="fixed inset-0 z-[200] bg-black/10 backdrop-blur-sm hidden items-center justify-center">
-        <div class="bg-white p-8 rounded-[32px] shadow-2xl max-w-sm w-full mx-4 text-center">
-            <h3 class="text-lg font-bold mb-2">确认清空？</h3>
-            <p class="text-sm text-gray-500 mb-8 leading-relaxed">对话历史将被从本地永久移除。</p>
-            <div class="flex gap-3">
-                <button onclick="hideClearConfirm()" class="flex-1 py-3 bg-gray-100 rounded-2xl text-sm font-bold">取消</button>
-                <button onclick="clearEverything()" class="flex-1 py-3 bg-red-500 text-white rounded-2xl text-sm font-bold">确认</button>
-            </div>
-        </div>
     </div>
 
     <!-- 设置面板 -->
@@ -284,45 +266,57 @@
             <div>
                 <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">画布比例</h4>
                 <div class="flex flex-wrap gap-3">
-                    <button onclick="setIm('ratio', '1024x1024')" id="r-1024x1024" class="px-6 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">1:1</button>
-                    <button onclick="setIm('ratio', '1280x720')" id="r-1280x720" class="px-6 py-3 border rounded-2xl text-sm">16:9</button>
-                    <button onclick="setIm('ratio', '720x1280')" id="r-720x1280" class="px-6 py-3 border rounded-2xl text-sm">9:16</button>
+                    <button onclick="setIm('ratio', '1024x1024')" id="r-1024x1024" class="px-6 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">1:1 Square</button>
+                    <button onclick="setIm('ratio', '1280x720')" id="r-1280x720" class="px-6 py-3 border rounded-2xl text-sm">16:9 Wide</button>
+                    <button onclick="setIm('ratio', '720x1280')" id="r-720x1280" class="px-6 py-3 border rounded-2xl text-sm">9:16 Portrait</button>
                 </div>
             </div>
             <div>
-                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">画质精度</h4>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">输出质量</h4>
                 <div class="flex gap-3">
-                    <button onclick="setIm('res', '2K')" id="res-2K" class="px-8 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">2K 标准</button>
+                    <button onclick="setIm('res', '2K')" id="res-2K" class="px-8 py-3 border rounded-2xl text-sm active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">2K 增强</button>
                     <button onclick="setIm('res', '4K')" id="res-4K" class="px-8 py-3 border rounded-2xl text-sm">4K 极致</button>
                 </div>
             </div>
             <div>
-                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">艺术风格</h4>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">风格预设</h4>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <button onclick="setIm('style', 'none')" id="st-none" class="p-3 border rounded-xl text-xs active-c bg-blue-50 border-blue-200 text-blue-600 font-bold">默认</button>
-                    <button onclick="setIm('style', 'watercolor')" id="st-watercolor" class="p-3 border rounded-xl text-xs">水彩</button>
-                    <button onclick="setIm('style', 'cyberpunk')" id="st-cyberpunk" class="p-3 border rounded-xl text-xs">赛博</button>
-                    <button onclick="setIm('style', 'realistic')" id="st-realistic" class="p-3 border rounded-xl text-xs">写实</button>
+                    <button onclick="setIm('style', 'watercolor')" id="st-watercolor" class="p-3 border rounded-xl text-xs">水彩风格</button>
+                    <button onclick="setIm('style', 'cyberpunk')" id="st-cyberpunk" class="p-3 border rounded-xl text-xs">赛博朋克</button>
+                    <button onclick="setIm('style', 'realistic')" id="st-realistic" class="p-3 border rounded-xl text-xs">写实摄影</button>
                 </div>
             </div>
-            <button onclick="toggleSheet(false)" class="w-full py-5 bg-gray-900 text-white rounded-2xl font-bold shadow-xl">保存配置</button>
+            <button onclick="toggleSheet(false)" class="w-full py-5 bg-gray-900 text-white rounded-2xl font-bold">保存并应用</button>
+        </div>
+    </div>
+
+    <!-- 弹窗 -->
+    <div id="modal" class="fixed inset-0 z-[200] bg-black/10 backdrop-blur-sm hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-[32px] shadow-2xl max-w-sm w-full mx-4 text-center">
+            <h3 class="text-lg font-bold mb-2">确认清空？</h3>
+            <p class="text-sm text-gray-500 mb-8 leading-relaxed">历史记录将被永久从本地缓存移除。</p>
+            <div class="flex gap-3">
+                <button onclick="hideClearConfirm()" class="flex-1 py-3 bg-gray-100 rounded-2xl text-sm font-bold">取消</button>
+                <button onclick="clearEverything()" class="flex-1 py-3 bg-red-500 text-white rounded-2xl text-sm font-bold">确认</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 专项部署配置
-        const apiKey = "sk-tREuwxY6308UzpstpZwm4WbrfKD3W42fPL552fnWn9suGRjc"; 
-        const IM_API = "https://api.apimart.ai/v1/images/generations";
-        const CHAT_API = "https://api.apimart.ai/v1/chat/completions";
-        const THINK_MODEL = "gemini-3-pro-preview-thinking"; 
-        const AUTH_HEADER = "Bearer " + apiKey;
+        // Google 官方原生接口配置
+        const GOOGLE_API_KEY = "AIzaSyBTQvyUebQRNYaUIh3WU8R4XbaJOnCD7ys"; 
+        const IM_API_KEY = "sk-tREuwxY6308UzpstpZwm4WbrfKD3W42fPL552fnWn9suGRjc";
+        
+        const GOOGLE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + GOOGLE_API_KEY;
+        const IM_API_URL = "https://api.apimart.ai/v1/images/generations";
 
         let app = {
             mode: 'thinking', busy: false, interrupted: false,
             tools: { search: false, deep: false },
             cfg: { ratio: '1024x1024', res: '2K', style: 'none' },
-            history: JSON.parse(localStorage.getItem('stream_v37_db') || '[]'),
-            session: [{ role: 'system', content: '你是由独立人黄修宇制作的多模态 AI 大模型 Stream。回答简洁。只有在询问开发者身份时才表明。' }],
+            history: JSON.parse(localStorage.getItem('stream_v40_db') || '[]'),
+            session: [], // Google 格式：{role: 'user' | 'model', parts: [{text: ''}]}
             currentId: null, abortCtrl: null
         };
 
@@ -346,13 +340,13 @@
             document.getElementById('welcome-view').classList.remove('hidden');
             const flow = document.getElementById('chat-flow');
             flow.classList.add('hidden'); flow.innerHTML = '';
-            app.session = [{ role: 'system', content: '你是由独立人黄修宇制作的多模态 AI 大模型 Stream。' }];
+            app.session = [];
             app.currentId = null;
         }
 
         function renderRecom() {
             const container = document.getElementById('recom-container');
-            const pool = ['写一段短视频脚本', '解释广义相对论', '制定一份健身计划', '提高专注力的技巧', '分析未来科技趋势', '如何高效学习Python'];
+            const pool = ['写一段短视频脚本', '解释相对论物理', '制定健身计划', '如何提高注意力', '推荐科幻读物', '学习 Python 建议'];
             const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
             container.innerHTML = shuffled.map(t => `<button onclick="injectText('${t}')" class="recom-chip">${t}</button>`).join('');
         }
@@ -394,7 +388,7 @@
             else { btn.className = "w-10 h-10 rounded-full blue-btn flex items-center justify-center shadow-md"; icon.className = "fas fa-arrow-up text-sm"; }
         }
 
-        // 核心修复：Thinking 跨域兼容调用
+        // Thinking：Google 官方原生 generateContent 逻辑
         async function callThink(prompt, id) {
             const wrap = appendMsg(id, '', 'ai');
             const loader = createSphereLoader(wrap, app.tools.deep ? '深度思考中…' : '正在思考中…');
@@ -403,73 +397,65 @@
             wrap.appendChild(content);
 
             try {
-                let context = [...app.session];
-                if(app.tools.deep) context[0].content += " 请进行全方位的深度逻辑拆解与推理分析。";
-                context.push({ role: 'user', content: prompt });
+                // 构造对话历史
+                app.session.push({ role: 'user', parts: [{ text: prompt }] });
+                
+                // 系统指令独立封装
+                let sysInstruction = "你是由独立人黄修宇制作的多模态 AI 大模型 Stream。回答简洁，不带任何 Markdown 符号。只有在询问开发者身份时才介绍开发者。";
+                if(app.tools.deep) sysInstruction += " 开启极致逻辑推理模式。";
 
-                const response = await fetch(CHAT_API, {
+                const response = await fetch(GOOGLE_URL, {
                     method: 'POST',
-                    mode: 'cors', // 强制跨域模式
-                    credentials: 'omit', // 忽略证书
-                    referrerPolicy: 'no-referrer', // 屏蔽来源，防止服务端拦截
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': AUTH_HEADER 
-                    },
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        model: THINK_MODEL, 
-                        messages: context,
-                        temperature: 0.7 
+                        contents: app.session,
+                        systemInstruction: { parts: [{ text: sysInstruction }] }
                     }),
                     signal: app.abortCtrl.signal
                 });
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`API 异常 (${response.status}): ${errorText.substring(0, 100)}`);
+                    const err = await response.json();
+                    throw new Error(err.error?.message || "Google API 连接受限");
                 }
 
                 const res = await response.json();
-                let text = res.choices?.[0]?.message?.content || "抱歉，目前服务连接不稳定，请稍后重试。";
+                let text = res.candidates?.[0]?.content?.parts?.[0]?.text || "暂无返回数据。";
                 text = text.replace(/[#*`~]/g, '').trim();
-                
+
                 if (app.interrupted) return;
-                app.session.push({ role: 'user', content: prompt }, { role: 'assistant', content: text });
+                app.session.push({ role: 'model', parts: [{ text }] });
                 loader.remove(); content.classList.replace('opacity-0', 'message-fade');
                 await typeText(text, content);
                 addCopy(wrap, text);
                 saveHistory(prompt);
             } catch (e) {
                 if (e.name === 'AbortError') return;
-                loader.remove(); content.innerHTML = `<span class="text-red-500 text-xs">Error: ${e.message}</span>`;
+                loader.remove(); content.innerHTML = `<span class="text-red-500 text-xs">连接中断: ${e.message}</span>`;
                 content.classList.replace('opacity-0', 'message-fade');
             }
         }
 
-        // 核心修复：Imagine 跨域兼容调用及四宫格渲染
         async function callIm(prompt, id) {
             const wrap = appendMsg(id, '', 'ai', true);
             const loader = createSphereLoader(wrap, '正在绘图中…');
             const grid = wrap.querySelector('.image-grid');
-
             try {
                 let p = prompt + (app.cfg.res === '4K' ? ', ultra-detailed 4k resolution' : '');
                 if(app.cfg.style !== 'none') {
-                    const styles = { watercolor: 'watercolor painting style', cyberpunk: 'cyberpunk neon aesthetic', realistic: 'hyper-realistic photography' };
-                    p += `, in ${styles[app.cfg.style]}`;
+                    const s = { watercolor: 'watercolor', cyberpunk: 'cyberpunk', realistic: 'hyper-realistic' };
+                    p += `, in ${s[app.cfg.style]} art style`;
                 }
 
-                const response = await fetch(IM_API, {
+                const response = await fetch(IM_API_URL, {
                     method: 'POST',
                     mode: 'cors',
-                    credentials: 'omit',
                     referrerPolicy: 'no-referrer',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': AUTH_HEADER },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + IM_API_KEY },
                     body: JSON.stringify({ model: "doubao-seedance-4-5", prompt: p, size: app.cfg.ratio, n: 4 }),
                     signal: app.abortCtrl.signal
                 });
-                
-                if (!response.ok) throw new Error("绘图服务暂时不可用");
                 
                 const res = await response.json();
                 if (app.interrupted) return;
@@ -477,18 +463,16 @@
 
                 if(res.data && res.data.length > 0) {
                     const urls = res.data.map(i => i.url);
-                    // 彻底修复 4 张渲染逻辑
+                    // 彻底修复四宫格排列
                     grid.innerHTML = urls.map(url => `
                         <div class="relative group rounded-2xl overflow-hidden aspect-square shadow-sm border border-gray-100 bg-gray-50">
                             <img src="${url}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
                         </div>
                     `).join('');
-                    app.session.push({ role: 'assistant', content: `[Images: ${JSON.stringify(urls)}]` });
+                    app.session.push({ role: 'model', parts: [{ text: `[Images: ${JSON.stringify(urls)}]` }] });
                     saveHistory(prompt);
-                } else { 
-                    grid.innerHTML = `<p class="col-span-2 text-xs text-red-500 text-center">生成失败: ${res.error?.message || '未知错误'}</p>`; 
-                }
-            } catch (e) { if (e.name === 'AbortError') return; loader.remove(); grid.innerHTML = `<p class="col-span-2 text-xs text-red-500 text-center py-4">接口超时，请重试</p>`; }
+                } else { grid.innerHTML = `<p class="col-span-2 text-xs text-red-500 text-center">生成失败</p>`; }
+            } catch (e) { if (e.name === 'AbortError') return; loader.remove(); grid.innerHTML = `<p class="col-span-2 text-xs text-red-500 text-center py-4">接口繁忙</p>`; }
         }
 
         function createSphereLoader(parent, text) { const div = document.createElement('div'); div.className = 'flex items-center gap-3 py-4 message-fade'; div.innerHTML = `<div class="sphere-loader"></div><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${text}</span>`; parent.appendChild(div); return div; }
@@ -501,7 +485,7 @@
             const entry = { id: app.currentId, title: t.substring(0, 10), session: JSON.parse(JSON.stringify(app.session)), mode: app.mode };
             const idx = app.history.findIndex(h => h.id === app.currentId);
             if(idx > -1) app.history[idx] = entry; else app.history.unshift(entry);
-            localStorage.setItem('stream_v37_db', JSON.stringify(app.history)); renderHistory();
+            localStorage.setItem('stream_v40_db', JSON.stringify(app.history)); renderHistory();
         }
 
         function loadHistory(id) {
@@ -512,18 +496,20 @@
             const flow = document.getElementById('chat-flow');
             flow.classList.remove('hidden'); flow.innerHTML = '';
             app.session.forEach((msg, idx) => {
-                if(msg.role === 'system') return;
-                const text = msg.content || ""; const isIm = text.startsWith('[Images:');
-                const wrap = appendMsg(Date.now()+idx, isIm ? '' : text, msg.role==='user'?'user':'ai', isIm);
-                if(isIm) { const urls = JSON.parse(text.slice(9, -1)); wrap.querySelector('.image-grid').innerHTML = urls.map(u => `<div class="rounded-2xl overflow-hidden aspect-square shadow-sm"><img src="${u}" referrerpolicy="no-referrer" class="w-full h-full object-cover"></div>`).join(''); }
-                else if(msg.role === 'assistant') addCopy(wrap.parentElement, text);
+                const text = msg.parts[0].text; const isIm = text.startsWith('[Images:');
+                const role = msg.role === 'user' ? 'user' : 'ai';
+                const wrap = appendMsg(Date.now()+idx, isIm ? '' : text, role, isIm);
+                if(isIm) {
+                    const urls = JSON.parse(text.slice(9, -1));
+                    wrap.querySelector('.image-grid').innerHTML = urls.map(u => `<div class="rounded-2xl overflow-hidden aspect-square shadow-sm"><img src="${u}" referrerpolicy="no-referrer" class="w-full h-full object-cover"></div>`).join('');
+                } else if(msg.role === 'model') addCopy(wrap.parentElement, text);
             });
             toggleSidebar(false);
             scrollToBottom();
         }
 
         function renderHistory() { const list = document.getElementById('history-list'); list.innerHTML = app.history.map(item => `<div onclick="loadHistory(${item.id})" class="p-3 text-xs text-gray-400 hover:bg-gray-50 rounded-xl truncate cursor-pointer transition-colors"><i class="far fa-message mr-3 opacity-30"></i> ${item.title}</div>`).join(''); }
-        function clearEverything() { localStorage.removeItem('stream_v37_db'); app.history = []; renderHistory(); clearChatUI(); hideClearConfirm(); }
+        function clearEverything() { localStorage.removeItem('stream_v40_db'); app.history = []; renderHistory(); clearChatUI(); hideClearConfirm(); }
         function newChat() { clearChatUI(); hideLanding(); toggleSidebar(false); }
         function showClearConfirm() { document.getElementById('modal').classList.remove('hidden').classList.add('flex'); }
         function hideClearConfirm() { document.getElementById('modal').classList.add('hidden').classList.remove('flex'); }
